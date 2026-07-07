@@ -39,8 +39,8 @@ Compose builds the same image, maps port **5000**, and mounts a **`tmpfs`** on `
 
 ## Push to Docker Hub  
 ```
-docker tag mlsokolova/quakewatch mlsokolova/quakewatch:3.1.0
-docker push mlsokolova/quakewatch:3.1.0
+docker tag mlsokolova/quakewatch mlsokolova/quakewatch:3.2.0
+docker push mlsokolova/quakewatch:3.2.0
 ```
 
 ## Project layout

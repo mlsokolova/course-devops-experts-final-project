@@ -1,4 +1,5 @@
 FROM python:3.11-slim
+ENV MPLBACKEND=Agg
 COPY Quakewatch/ /Quakewatch/
 WORKDIR /Quakewatch
 RUN pip install --no-cache-dir -r requirements.txt \

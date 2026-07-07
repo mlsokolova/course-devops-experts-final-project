@@ -5,6 +5,7 @@ metadata:
   namespace: final-project
 data:
   QUAKEWATCH__LOG_PATH: /tmp/logs
+  MPLBACKEND: Agg
   MPLCONFIGDIR: /tmp/matplotlib
   DUCKDB__PATH: /data/earthquakes.duckdb
   QUACK__HOST: duckdb

@@ -2,7 +2,7 @@
 
 This phase deploys the customized QuakeWatch stack on Kubernetes: the Flask web app (`quakewatch`) and the DuckDB Quack server (`duckdb`). The web app queries USGS for live graphs and uses `quakestats.py` to fetch historical statistics from DuckDB over the Quack protocol.
 
-Image: `mlsokolova/quakewatch:3.1.0` (namespace `final-project`).
+Image: `mlsokolova/quakewatch:3.2.0` (namespace `final-project`).
 
 All manifests live in the [`kubernetes/`](../kubernetes/) folder. Run `kubectl` commands below from the `final-project` directory.
 
@@ -16,8 +16,8 @@ kubectl config set-context --current --namespace=final-project
 ## Run the dockerized web app as a pod (optional smoke test)
 
 ```bash
-docker pull mlsokolova/quakewatch:3.1.0
-kubectl run quakewatch --image=mlsokolova/quakewatch:3.1.0
+docker pull mlsokolova/quakewatch:3.2.0
+kubectl run quakewatch --image=mlsokolova/quakewatch:3.2.0
 ```
 
 This runs only the Flask container without DuckDB. Pages that depend on `QuakeStats` (for example `/graph-earthquakes`) need the full stack below.

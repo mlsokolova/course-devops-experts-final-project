@@ -9,3 +9,5 @@ data-tools
 logs
 .terraform*
 terraform.tfstate*
+.venv
+seed-data

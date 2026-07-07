@@ -2,7 +2,7 @@
 
 Helm chart in [`helm/`](../helm/) packages the manifests from [`kubernetes/`](../kubernetes/) as a single installable release.
 
-Image: `mlsokolova/quakewatch:3.1.0` (namespace `final-project`).
+Image: `mlsokolova/quakewatch:3.2.0` (namespace `final-project`).
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ Override common settings:
 
 ```bash
 helm upgrade quakewatch ./helm -n final-project \
-  --set image.tag=3.1.0 \
+  --set image.tag=3.2.0 \
   --set secret.quackToken=my-secret-token \
   --set persistence.pv.hostPath=/data/duckdb
 ```

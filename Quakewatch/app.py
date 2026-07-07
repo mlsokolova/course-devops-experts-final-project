@@ -1,19 +1,18 @@
-import matplotlib
-matplotlib.use('Agg')  # Force non-GUI backend before any other matplotlib import
-
-import os
+"""Flask application factory for QuakeWatch."""
 import logging
+import os
 from logging.handlers import RotatingFileHandler
-from flask import Flask
+
+from flask import Flask, request
+
 from dashboard import dashboard_blueprint
-from utils import timestamp_to_str  # Import our custom filter
+from utils import timestamp_to_str
+
 
 def create_app():
-    app = Flask(__name__)
+    """Create and configure the Flask application."""
+    flask_app = Flask(__name__)
 
-    # -------------------------
-    # Logging Configuration
-    # -------------------------
     log_path = os.getenv('QUAKEWATCH__LOG_PATH')
     if not os.path.exists(log_path):
         os.makedirs(log_path)
@@ -22,7 +21,7 @@ def create_app():
     error_handler.setLevel(logging.ERROR)
     error_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     error_handler.setFormatter(error_formatter)
-    app.logger.addHandler(error_handler)
+    flask_app.logger.addHandler(error_handler)
 
     usage_handler = RotatingFileHandler(f'{log_path}/access.log', maxBytes=1000000, backupCount=3)
     usage_handler.setLevel(logging.INFO)
@@ -32,19 +31,16 @@ def create_app():
     usage_logger.addHandler(usage_handler)
     usage_logger.setLevel(logging.INFO)
 
-    @app.before_request
+    @flask_app.before_request
     def log_request_info():
-        from flask import request
-        usage_logger.info(f"{request.remote_addr} - {request.method} {request.url}")
+        usage_logger.info("%s - %s %s", request.remote_addr, request.method, request.url)
 
-    # Register our blueprint
-    app.register_blueprint(dashboard_blueprint)
+    flask_app.register_blueprint(dashboard_blueprint)
+    flask_app.jinja_env.filters['timestamp_to_str'] = timestamp_to_str
 
-    # Register custom Jinja2 filter so templates can use |timestamp_to_str
-    app.jinja_env.filters['timestamp_to_str'] = timestamp_to_str
+    return flask_app
 
-    return app
 
 if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', debug=True)
+    application = create_app()
+    application.run(host='0.0.0.0', debug=True)

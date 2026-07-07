@@ -35,7 +35,7 @@ spec:
               name: quakewatch
               key: QUACK__PORT
       containers:
-      - image: mlsokolova/quakewatch:3.1.0
+      - image: mlsokolova/quakewatch:3.2.0
         name: quakewatch
         resources:
           requests:
@@ -64,6 +64,11 @@ spec:
             configMapKeyRef:
               name: quakewatch
               key: QUAKEWATCH__LOG_PATH
+        - name: MPLBACKEND
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: MPLBACKEND
         - name: MPLCONFIGDIR
           valueFrom:
             configMapKeyRef:

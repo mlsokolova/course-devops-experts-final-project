@@ -186,7 +186,7 @@ Install: `helm install quakewatch ./helm -n final-project --create-namespace` â€
 
 | File | Purpose |
 | ---- | ------- |
-| [1-Docker.md](docs/1-Docker.md) | Phase 1: build, run, compose, push image tag `3.1.0` |
+| [1-Docker.md](docs/1-Docker.md) | Phase 1: build, run, compose, push image tag `3.2.0` |
 | [2-Kubernetes.md](docs/2-Kubernetes.md) | Phase 2: namespace, ConfigMap, Secret, PV, DuckDB + QuakeWatch deploy, CronJob, HPA |
 | [3-Helm.md](docs/3-Helm.md) | Phase 3: Helm chart install, upgrade, uninstall |
 | [install-kubernetes-cluster.pdf](docs/install-kubernetes-cluster.pdf) | Docker Desktop Kubernetes on Windows 11 |
@@ -206,7 +206,7 @@ kubectl apply -f kubernetes/duckdb.yaml
 kubectl apply -f kubernetes/quakewatch.yaml
 ```
 
-Image tag: `mlsokolova/quakewatch:3.1.0`
+Image tag: `mlsokolova/quakewatch:3.2.0`
 
 ## TODO
 

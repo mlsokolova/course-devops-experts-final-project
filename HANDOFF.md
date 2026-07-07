@@ -3,6 +3,7 @@
 ## Context
 - Project: `final-project` (QuakeWatch + DuckDB/Quack)
 - Current phase: Docker + Kubernetes manifests + Helm chart
+- Next task: implement github actions
 
 ## Architecture Snapshot
 - `quakewatch` (Flask app) calls:
@@ -24,7 +25,7 @@
   - `kubernetes/hpa-quakewatch.yaml`
   - `kubernetes/cronjob-quakewath-check.yaml`
   - `kubernetes/components.yaml`
-- Standardized image tag usage to `mlsokolova/quakewatch:3.1.0` across manifests/docs/compose.
+- Standardized image tag usage to `mlsokolova/quakewatch:3.2.0` across manifests/docs/compose.
 - Created Helm chart in `helm/` that implements kubernetes resources:
   - `Chart.yaml`, `values.yaml`, `_helpers.tpl`
   - templates for app/data deployments and services, configmap/secret, pv/pvc, hpa, cronjob, metrics-server, test pod

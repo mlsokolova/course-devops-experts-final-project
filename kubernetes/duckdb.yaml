@@ -18,7 +18,7 @@ spec:
     spec:
       initContainers:
       - name: seed-data
-        image: mlsokolova/quakewatch:3.1.0
+        image: mlsokolova/quakewatch:3.2.0
         command:
         - python
         - seed_data.py
@@ -32,7 +32,7 @@ spec:
         - name: duckdb-data
           mountPath: /data
       containers:
-      - image: mlsokolova/quakewatch:3.1.0
+      - image: mlsokolova/quakewatch:3.2.0
         name: duckdb
         command:
         - python
