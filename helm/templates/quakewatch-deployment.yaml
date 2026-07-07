@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quakewatch.quakewatchName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "quakewatch.quakewatchName" . }}
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.quakewatch.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "quakewatch.quakewatchName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "quakewatch.quakewatchName" . }}
+    spec:
+      initContainers:
+      - name: wait-for-duckdb
+        image: {{ .Values.quakewatch.initContainers.waitForDuckdb.image }}
+        command:
+        - sh
+        - -c
+        - until nc -z $QUACK__HOST $QUACK__PORT; do echo waiting for duckdb quack service; sleep 2; done
+        env:
+        - name: QUACK__HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: QUACK__HOST
+        - name: QUACK__PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: QUACK__PORT
+      containers:
+      - name: {{ include "quakewatch.quakewatchName" . }}
+        image: {{ include "quakewatch.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.quakewatch.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.quakewatch.service.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.quakewatch.service.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        env:
+        - name: QUAKEWATCH__LOG_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: QUAKEWATCH__LOG_PATH
+        - name: MPLCONFIGDIR
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: MPLCONFIGDIR
+        - name: QUACK__HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: QUACK__HOST
+        - name: QUACK__PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: QUACK__PORT
+        - name: QUACK__TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "quakewatch.secretName" . }}
+              key: QUACK__TOKEN

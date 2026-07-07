@@ -1,0 +1,20 @@
+{{- if and .Values.persistence.enabled .Values.persistence.pv.create }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.persistence.pv.name }}
+  labels:
+    app: {{ include "quakewatch.duckdbName" . }}
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: {{ .Values.persistence.pv.storage }}
+  volumeMode: Filesystem
+  accessModes:
+    - {{ .Values.persistence.pv.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistence.pv.reclaimPolicy }}
+  storageClassName: {{ .Values.persistence.pv.storageClassName | quote }}
+  hostPath:
+    path: {{ .Values.persistence.pv.hostPath }}
+    type: DirectoryOrCreate
+{{- end }}

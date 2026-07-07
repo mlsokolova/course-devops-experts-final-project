@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: quakewatch
+  name: quakewatch
+  namespace: final-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quakewatch
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: quakewatch
+    spec:
+      initContainers:
+      - name: wait-for-duckdb
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - until nc -z $QUACK__HOST $QUACK__PORT; do echo waiting for duckdb quack service; sleep 2; done
+        env:
+        - name: QUACK__HOST
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: QUACK__HOST
+        - name: QUACK__PORT
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: QUACK__PORT
+      containers:
+      - image: mlsokolova/quakewatch:3.1.0
+        name: quakewatch
+        resources:
+          requests:
+            cpu: "0.1"
+            memory: "250Mi"
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        env:
+        - name: QUAKEWATCH__LOG_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: QUAKEWATCH__LOG_PATH
+        - name: MPLCONFIGDIR
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: MPLCONFIGDIR
+        - name: QUACK__HOST
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: QUACK__HOST
+        - name: QUACK__PORT
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: QUACK__PORT
+        - name: QUACK__TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: quakewatch
+              key: QUACK__TOKEN
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: quakewatch
+  name: quakewatch
+  namespace: final-project
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: quakewatch
+  type: NodePort
+status:
+  loadBalancer: {}

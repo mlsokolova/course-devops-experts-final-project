@@ -1,0 +1,41 @@
+services:
+  quakewatch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mlsokolova/quakewatch:3.1.0
+    container_name: quakewatch
+    hostname: quakewatch
+    ports:
+      - "5000:5000"
+    environment:
+      MPLCONFIGDIR: /tmp/matplotlib
+      QUAKEWATCH__LOG_PATH: /tmp/logs
+      QUACK__TOKEN: my-secret-token
+      QUACK__HOST: duckdb
+      QUACK__PORT: 9494
+  duckdb:
+    image: mlsokolova/quakewatch:3.1.0
+    container_name: duckdb
+    hostname: duckdb
+    ports:
+      - "5001:5000"
+      - "9494:9494"
+    environment:
+      QUACK__TOKEN: my-secret-token
+      DUCKDB__PATH: /data/earthquakes.duckdb
+      QUACK__PORT: 9494
+    volumes:
+      - duckdb-data:/data
+    entrypoint:
+      - python
+      - duckdb-quack-service.py
+volumes:
+  duckdb-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./seed-data
+      o: bind
+    
+

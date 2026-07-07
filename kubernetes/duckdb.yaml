@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: duckdb
+  name: duckdb
+  namespace: final-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: duckdb
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: duckdb
+    spec:
+      initContainers:
+      - name: seed-data
+        image: mlsokolova/quakewatch:3.1.0
+        command:
+        - python
+        - seed_data.py
+        env:
+        - name: DUCKDB__PATH
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: DUCKDB__PATH
+        volumeMounts:
+        - name: duckdb-data
+          mountPath: /data
+      containers:
+      - image: mlsokolova/quakewatch:3.1.0
+        name: duckdb
+        command:
+        - python
+        - duckdb-quack-service.py
+        ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP
+        - containerPort: 9494
+          name: quack
+          protocol: TCP
+        resources:
+          requests:
+            cpu: "0.1"
+            memory: "250Mi"
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: 9494
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        env:
+        - name: DUCKDB__PATH
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: DUCKDB__PATH
+        - name: QUACK__PORT
+          valueFrom:
+            configMapKeyRef:
+              name: quakewatch
+              key: QUACK__PORT
+        - name: QUACK__TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: quakewatch
+              key: QUACK__TOKEN
+        volumeMounts:
+        - name: duckdb-data
+          mountPath: /data
+      volumes:
+      - name: duckdb-data
+        persistentVolumeClaim:
+          claimName: duckdb-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: duckdb
+  name: duckdb
+  namespace: final-project
+spec:
+  ports:
+  - name: http
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  - name: quack
+    port: 9494
+    protocol: TCP
+    targetPort: 9494
+  selector:
+    app: duckdb
+  type: ClusterIP

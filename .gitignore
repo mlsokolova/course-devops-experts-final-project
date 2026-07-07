@@ -1,0 +1,11 @@
+*.zip
+__pycache__/
+*.py[cod]
+Quakewatch/logs/
+*.tgz
+*.pdf
+earthquakes.duckdb
+data-tools
+logs
+.terraform*
+terraform.tfstate*

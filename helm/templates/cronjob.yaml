@@ -1,0 +1,26 @@
+{{- if .Values.cronjob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.cronjob.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.cronjob.backoffLimit }}
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: check
+            image: {{ .Values.cronjob.image }}
+            args:
+            - "-f"
+            - "http://{{ include "quakewatch.quakewatchName" . }}:{{ .Values.quakewatch.service.port }}{{ .Values.cronjob.healthCheckPath }}"
+{{- end }}

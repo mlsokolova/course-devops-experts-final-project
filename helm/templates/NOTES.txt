@@ -1,0 +1,18 @@
+1. Get the QuakeWatch URL:
+
+{{- if contains "NodePort" .Values.quakewatch.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "quakewatch.quakewatchName" . }})
+  export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT/
+{{- else }}
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "quakewatch.quakewatchName" . }} 5000:{{ .Values.quakewatch.service.port }}
+  echo "Visit http://127.0.0.1:5000/graph-earthquakes"
+{{- end }}
+
+2. Check pod status:
+
+  kubectl get pods -n {{ .Release.Namespace }}
+
+3. DuckDB Quack service:
+
+  kubectl get svc {{ include "quakewatch.duckdbServiceName" . }} -n {{ .Release.Namespace }}

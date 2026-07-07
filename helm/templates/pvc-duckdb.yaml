@@ -1,0 +1,20 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.persistence.pvc.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "quakewatch.duckdbName" . }}
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.persistence.pvc.storageClassName | quote }}
+  accessModes:
+    - {{ .Values.persistence.pvc.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.pvc.storage }}
+  {{- if .Values.persistence.pv.create }}
+  volumeName: {{ .Values.persistence.pv.name }}
+  {{- end }}
+{{- end }}

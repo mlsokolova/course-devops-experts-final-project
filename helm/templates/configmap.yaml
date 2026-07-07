@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "quakewatch.configMapName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "quakewatch.labels" . | nindent 4 }}
+data:
+  QUAKEWATCH__LOG_PATH: {{ .Values.config.quakewatchLogPath | quote }}
+  MPLCONFIGDIR: {{ .Values.config.mplConfigDir | quote }}
+  DUCKDB__PATH: {{ .Values.config.duckdbPath | quote }}
+  QUACK__HOST: {{ include "quakewatch.duckdbServiceName" . | quote }}
+  QUACK__PORT: {{ .Values.config.quackPort | quote }}

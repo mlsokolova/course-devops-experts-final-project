@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: quakewatch-health-check
+  namespace: final-project
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 60
+  failedJobsHistoryLimit: 180
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: check
+            image: curlimages/curl:8.20.0
+# curl -f returns 22 in case of 500 server error
+# /graph-earthquakes path returns 500 when USGS is not accessible
+# Heaviest check, but most reliable: /graph-earthquakes
+            args:
+              - "-f"
+              - "http://quakewatch:5000/graph-earthquakes"
+                

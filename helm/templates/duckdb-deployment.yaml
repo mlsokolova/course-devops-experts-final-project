@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quakewatch.duckdbName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "quakewatch.duckdbName" . }}
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.duckdb.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "quakewatch.duckdbName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "quakewatch.duckdbName" . }}
+    spec:
+      initContainers:
+      - name: seed-data
+        image: {{ include "quakewatch.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - python
+        - seed_data.py
+        env:
+        - name: DUCKDB__PATH
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: DUCKDB__PATH
+        {{- if .Values.persistence.enabled }}
+        volumeMounts:
+        - name: duckdb-data
+          mountPath: /data
+        {{- end }}
+      containers:
+      - name: {{ include "quakewatch.duckdbName" . }}
+        image: {{ include "quakewatch.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - python
+        - duckdb-quack-service.py
+        ports:
+        - containerPort: {{ .Values.duckdb.service.httpPort }}
+          name: http
+          protocol: TCP
+        - containerPort: {{ .Values.duckdb.service.quackPort }}
+          name: quack
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.duckdb.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.duckdb.service.httpPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.duckdb.service.quackPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        env:
+        - name: DUCKDB__PATH
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: DUCKDB__PATH
+        - name: QUACK__PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "quakewatch.configMapName" . }}
+              key: QUACK__PORT
+        - name: QUACK__TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "quakewatch.secretName" . }}
+              key: QUACK__TOKEN
+        {{- if .Values.persistence.enabled }}
+        volumeMounts:
+        - name: duckdb-data
+          mountPath: /data
+        {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+      - name: duckdb-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.pvc.name }}
+      {{- end }}

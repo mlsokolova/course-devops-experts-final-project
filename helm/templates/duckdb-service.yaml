@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quakewatch.duckdbServiceName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "quakewatch.duckdbName" . }}
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.duckdb.service.type }}
+  ports:
+  - name: http
+    port: {{ .Values.duckdb.service.httpPort }}
+    protocol: TCP
+    targetPort: {{ .Values.duckdb.service.httpPort }}
+  - name: quack
+    port: {{ .Values.duckdb.service.quackPort }}
+    protocol: TCP
+    targetPort: {{ .Values.duckdb.service.quackPort }}
+  selector:
+    app: {{ include "quakewatch.duckdbName" . }}

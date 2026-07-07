@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quakewatch.quakewatchName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "quakewatch.quakewatchName" . }}
+    {{- include "quakewatch.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.quakewatch.service.type }}
+  ports:
+  - port: {{ .Values.quakewatch.service.port }}
+    protocol: TCP
+    targetPort: {{ .Values.quakewatch.service.port }}
+  selector:
+    app: {{ include "quakewatch.quakewatchName" . }}
