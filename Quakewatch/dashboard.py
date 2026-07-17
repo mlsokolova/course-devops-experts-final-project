@@ -151,4 +151,6 @@ class EarthquakeDashboard:
             stats=stats.stats,
             max_earthquake=stats.max_earthquake,
             earthquakes_stats=stats.stats,
+            avg_per_day=stats.avg_per_day,
+            day_with_max_earthquakes=stats.day_with_max_earthquakes,
         )

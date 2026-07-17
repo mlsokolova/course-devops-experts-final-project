@@ -27,7 +27,7 @@
 <hr>
 <h2>Earthquake Statistics for {{ current_location }} Area</h2>
 <div class="row mb-5">
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card text-center">
       <div class="card-body">
         <h5 class="card-title">Max Earthquake</h5>
@@ -35,11 +35,27 @@
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card text-center">
       <div class="card-body">
         <h5 class="card-title">Earthquakes Statistics</h5>
         <p class="card-text">{{ earthquakes_stats }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title">Average Quakes Per Day</h5>
+        <p class="card-text">{{ avg_per_day }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title">Day With Most Quakes</h5>
+        <p class="card-text">{{ day_with_max_earthquakes }}</p>
       </div>
     </div>
   </div>

@@ -19,6 +19,8 @@ class QuakeStats:
         self.quack_uri = f"quack:{self.QUACK__HOST}:{self.QUACK__PORT}"
         self.stats = self.get_stats_over_area()
         self.max_earthquake = self.get_max_earthquake_in_area()
+        self.avg_per_day = self.get_average_quakes_per_day()
+        self.day_with_max_earthquakes = self.get_day_with_max_earthquakes()
 
     def run_query(self, query):
         """Execute a SQL query against the remote Quack database."""
@@ -82,6 +84,59 @@ select epoch_ms(time)::VARCHAR as "When",
        magnitudo as "Magnitude"
 from filtered_points
 order by magnitudo desc
+limit 1
+"""
+        query_res = self.run_query(sql)
+        return self.jsonify_query_result(query_result=query_res)
+
+    def get_average_quakes_per_day(self):
+        """Return the average number of earthquakes per day in the configured area."""
+        sql = f"""
+with filtered_points as
+(
+select *
+from earthquakes
+WHERE ST_Distance_Spheroid(
+    ST_Point(latitude, longitude),
+    ST_Point({self.latitude}, {self.longitude})
+) <= {self.radius * 1000}
+)
+, daily_counts as
+(
+select CAST(epoch_ms(time) AS DATE) as quake_day,
+       count(*) as quake_count
+from filtered_points
+group by 1
+)
+select avg(quake_count) as average_quakes_per_day
+from daily_counts
+"""
+        query_res = self.run_query(sql)
+        return self.jsonify_query_result(query_result=query_res)
+
+    def get_day_with_max_earthquakes(self):
+        """Return the day with the most earthquakes in the configured area."""
+        sql = f"""
+with filtered_points as
+(
+select *
+from earthquakes
+WHERE ST_Distance_Spheroid(
+    ST_Point(latitude, longitude),
+    ST_Point({self.latitude}, {self.longitude})
+) <= {self.radius * 1000}
+)
+, daily_counts as
+(
+select CAST(epoch_ms(time) AS DATE) as quake_day,
+       count(*) as quake_count
+from filtered_points
+group by 1
+)
+select quake_day::VARCHAR as "Day",
+       quake_count as "Earthquakes"
+from daily_counts
+order by quake_count desc
 limit 1
 """
         query_res = self.run_query(sql)

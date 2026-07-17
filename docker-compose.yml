@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: mlsokolova/quakewatch:3.2.0
+    image: mlsokolova/quakewatch
     container_name: quakewatch
     hostname: quakewatch
     ports:
@@ -16,7 +16,7 @@ services:
       QUACK__HOST: duckdb
       QUACK__PORT: 9494
   duckdb:
-    image: mlsokolova/quakewatch:3.2.0
+    image: mlsokolova/quakewatch
     container_name: duckdb
     hostname: duckdb
     ports:

@@ -13,9 +13,19 @@ jobs:
   checkout-and-message:
     runs-on: ubuntu-latest
     steps:
-      - name: pylint
-        # old version, get "Warning: Node.js 20 actions are deprecated."
+      - name: checkout the code
         uses: actions/checkout@v6
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+        python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pylint
+
+      - name: Run pylint
+        run: pylint $(ls -R Quakewatch/*.py)
+
       - name: build the Docker image
-        run: echo "here will pylint check"
+        run: docker build -t mlsokolova/quakewatch .
