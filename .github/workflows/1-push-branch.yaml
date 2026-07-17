@@ -10,7 +10,7 @@ on:
     
 # 4. JOBS AND STEPS
 jobs:
-  checkout-and-message:
+  check-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: checkout the code
