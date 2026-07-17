@@ -21,7 +21,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install requirements
+        run: pip install -r Quakewatch/requirements.txt
+
+      - name: Install pylint
         run: pip install pylint
 
       - name: Run pylint
