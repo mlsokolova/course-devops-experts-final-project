@@ -1,4 +1,5 @@
 """DuckDB/Quack client for earthquake statistics queries."""
+import json
 import os
 
 import duckdb
@@ -17,10 +18,7 @@ class QuakeStats:
         self.radius = radius
         self.conn = duckdb.connect(database=':memory:')
         self.quack_uri = f"quack:{self.QUACK__HOST}:{self.QUACK__PORT}"
-        self.stats = self.get_stats_over_area()
-        self.max_earthquake = self.get_max_earthquake_in_area()
-        self.avg_per_day = self.get_average_quakes_per_day()
-        self.day_with_max_earthquakes = self.get_day_with_max_earthquakes()
+        self.all_stats = self.get_all_stats()
 
     def run_query(self, query):
         """Execute a SQL query against the remote Quack database."""
@@ -141,3 +139,12 @@ limit 1
 """
         query_res = self.run_query(sql)
         return self.jsonify_query_result(query_result=query_res)
+
+    def get_all_stats(self):
+        """Combine all area statistics into a single JSON object."""
+        return json.dumps({
+            "stats": json.loads(self.get_stats_over_area()),
+            "max_earthquake": json.loads(self.get_max_earthquake_in_area()),
+            "avg_per_day": json.loads(self.get_average_quakes_per_day()),
+            "day_with_max_earthquakes": json.loads(self.get_day_with_max_earthquakes()),
+        })
