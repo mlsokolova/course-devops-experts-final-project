@@ -28,4 +28,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: push the Docker image
-        run: docker push $DOCKERHUB_USERNAME/quakewatch:${{ github.event.pull_request.head.ref }}
+        run: docker push ${{ vars.DOCKERHUB_USERNAME }}/quakewatch:${{ github.event.pull_request.head.ref }}
