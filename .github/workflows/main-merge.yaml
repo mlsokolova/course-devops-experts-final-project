@@ -9,7 +9,10 @@ on:
       - 'closed'
     branches:
       - 'main'
-    
+    paths:
+      - 'Quakewatch/**'
+      - 'Dockerfile'
+
 # 4. JOBS AND STEPS
 jobs:
   build-and-push-docker-image:
