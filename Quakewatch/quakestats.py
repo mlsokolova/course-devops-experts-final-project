@@ -141,10 +141,16 @@ limit 1
         return self.jsonify_query_result(query_result=query_res)
 
 
-    def get_depth_distribution(self):
-        """Return the distribution of earthquake depths in the configured area."""
-        pass
-        
+    def get_observation_date_range(self):
+        """Return the date range of the observations"""
+        sql = f"""
+        select cast(cast(min(epoch_ms(time)) as date) as varchar) as min_date, 
+               cast(cast(max(epoch_ms(time)) as date) as varchar) as max_date
+        from earthquakes
+        """
+        query_res = self.run_query(sql)
+        return self.jsonify_query_result(query_result=query_res)
+
     def get_all_stats(self):
         """Combine all area statistics into a single JSON object."""
         return json.dumps({
@@ -152,4 +158,5 @@ limit 1
             "max_earthquake": json.loads(self.get_max_earthquake_in_area()),
             "avg_per_day": json.loads(self.get_average_quakes_per_day()),
             "day_with_max_earthquakes": json.loads(self.get_day_with_max_earthquakes()),
+            "observation_date_range": json.loads(self.get_observation_date_range()),
         })

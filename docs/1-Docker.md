@@ -20,7 +20,7 @@ docker build -t mlsokolova/quakewatch .
 ## Load seed data
 
 ```bash
-docker run --volume ./seed-data:/data -e "DUCKDB__PATH=/data/earthquakes.duckdb" mlsokolova/quakewatch python seed_data.py
+docker run --rm --volume ./seed-data:/data -e "DUCKDB__PATH=/data/earthquakes.duckdb" mlsokolova/quakewatch python seed_data.py
 ```
 
 ## Run with Docker Compose
