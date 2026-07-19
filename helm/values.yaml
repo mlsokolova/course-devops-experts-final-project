@@ -16,7 +16,7 @@ secret:
 
 image:
   repository: mlsokolova/quakewatch
-  tag: "3.2.0"
+  tag: "3.3.0"
   pullPolicy: IfNotPresent
 
 quakewatch:
