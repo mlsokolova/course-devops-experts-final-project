@@ -140,6 +140,11 @@ limit 1
         query_res = self.run_query(sql)
         return self.jsonify_query_result(query_result=query_res)
 
+
+    def get_depth_distribution(self):
+        """Return the distribution of earthquake depths in the configured area."""
+        pass
+        
     def get_all_stats(self):
         """Combine all area statistics into a single JSON object."""
         return json.dumps({
