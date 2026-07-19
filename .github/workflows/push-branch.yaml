@@ -5,30 +5,43 @@ run-name: runs pylint on python files and builds the Docker image
 # 2. TRIGGER EVENTS
 on:
   push:
+    # Validate version branches, but never run this workflow for main.
     branches-ignore:
       - 'main'
+    # Run only when the application or its image definition changes.
+    # These filters match added, modified, and deleted files.
+    paths:
+      - 'Quakewatch/**'
+      - 'Dockerfile'
     
 # 4. JOBS AND STEPS
 jobs:
   check-and-build:
+    # Use a fresh GitHub-hosted Linux runner for every workflow run.
     runs-on: ubuntu-latest
     steps:
       - name: checkout the code
+        # Make the repository contents available to later steps.
         uses: actions/checkout@v6
 
       - name: Set up Python 3.11
+        # Match the Python version used by the application image.
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install requirements
+        # Install application dependencies so Pylint can import project modules.
         run: pip install -r Quakewatch/requirements.txt
 
       - name: Install pylint
         run: pip install pylint
 
       - name: Run pylint
+        # Fail the workflow when Python lint checks fail.
         run: pylint $(ls -R Quakewatch/*.py)
 
       - name: build the Docker image
+        # Verify that the Dockerfile and application can produce an image.
+        # This validation workflow does not push the image to Docker Hub.
         run: docker build -t mlsokolova/quakewatch .
