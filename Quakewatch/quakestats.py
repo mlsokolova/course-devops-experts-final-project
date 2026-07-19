@@ -143,7 +143,7 @@ limit 1
 
     def get_observation_date_range(self):
         """Return the date range of the observations"""
-        sql = f"""
+        sql = """
         select cast(cast(min(epoch_ms(time)) as date) as varchar) as min_date, 
                cast(cast(max(epoch_ms(time)) as date) as varchar) as max_date
         from earthquakes
