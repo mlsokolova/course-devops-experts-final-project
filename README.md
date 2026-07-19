@@ -137,6 +137,8 @@ Install: `helm install quakewatch ./helm -n final-project --create-namespace` â€
 | [1-Docker.md](docs/1-Docker.md) | Phase 1: build, run, compose, push image tag `3.2.0` |
 | [2-Kubernetes.md](docs/2-Kubernetes.md) | Phase 2: namespace, ConfigMap, Secret, PV, DuckDB + QuakeWatch deploy, CronJob, HPA |
 | [3-Helm.md](docs/3-Helm.md) | Phase 3: Helm chart install, upgrade, uninstall |
+| [4-Branching-Strategy.md](docs/4-Branching-Strategy.md) | Version branches, pull requests, releases, and Argo CD synchronization |
+| [5-GitHub-Actions.md](docs/5-GitHub-Actions.md) | CI validation and Docker image publishing workflows |
 | [install-kubernetes-cluster.pdf](docs/install-kubernetes-cluster.pdf) | Docker Desktop Kubernetes on Windows 11 |
 
 ## Docker image versioning

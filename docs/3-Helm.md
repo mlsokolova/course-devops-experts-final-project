@@ -1,8 +1,8 @@
 # Phase 3: Packaging — Helm
 
-Helm chart in [`helm/`](../helm/) packages the manifests from [`kubernetes/`](../kubernetes/) as a single installable release.
+The Helm chart in [`helm/`](../helm/) packages the manifests from [`kubernetes/`](../kubernetes/) as a single installable release.
 
-Image: `mlsokolova/quakewatch:3.2.0` (namespace `final-project`).
+The examples use image `mlsokolova/quakewatch:3.2.0` in the `final-project` namespace.
 
 ## Prerequisites
 
@@ -63,7 +63,7 @@ Visit [http://127.0.0.1:5000/graph-earthquakes](http://127.0.0.1:5000/graph-eart
 helm uninstall quakewatch -n final-project
 ```
 
-PersistentVolume with `Retain` policy is not removed automatically. Delete manually if needed:
+A PersistentVolume with a `Retain` policy is not removed automatically. Delete it manually if needed:
 
 ```bash
 kubectl delete pv duckdb-data
@@ -97,12 +97,15 @@ helm template quakewatch ./helm -n final-project
 
 The flat manifests in `kubernetes/` remain available for step-by-step learning (see [2-Kubernetes.md](2-Kubernetes.md)). The Helm chart is equivalent for deployment; prefer one approach per environment to avoid duplicate resources.
 
-## Pack and publish to the Docker Hub artifact repository 
-```
+## Package and publish to the Docker Hub OCI registry
+
+```bash
 helm package ./helm
 helm push quakewatch-0.1.0.tgz oci://registry-1.docker.io/mlsokolova
 ```
-## Install from Docker Hub  
-```
+
+## Install from Docker Hub
+
+```bash
 helm upgrade -i quakewatch oci://registry-1.docker.io/mlsokolova/quakewatch --version 0.1.0 --set metricsServer.enabled=true
-``
+```

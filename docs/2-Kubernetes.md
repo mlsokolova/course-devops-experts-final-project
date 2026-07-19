@@ -2,7 +2,7 @@
 
 This phase deploys the customized QuakeWatch stack on Kubernetes: the Flask web app (`quakewatch`) and the DuckDB Quack server (`duckdb`). The web app queries USGS for live graphs and uses `quakestats.py` to fetch historical statistics from DuckDB over the Quack protocol.
 
-Image: `mlsokolova/quakewatch:3.2.0` (namespace `final-project`).
+The examples use image `mlsokolova/quakewatch:3.2.0` in the `final-project` namespace.
 
 All manifests live in the [`kubernetes/`](../kubernetes/) folder. Run `kubectl` commands below from the `final-project` directory.
 
@@ -38,7 +38,7 @@ kubectl apply -f kubernetes/pv-duckdb.yaml
 | `kubernetes/secret-quakewatch.yaml` | Secret | `QUACK__TOKEN` (shared by `quakewatch` and `duckdb`) |
 | `kubernetes/pv-duckdb.yaml` | PV + PVC | Persistent storage for `/data/earthquakes.duckdb` |
 
-The PVC `duckdb-data` uses a `hostPath` volume at `/data/duckdb` on the node. On Docker Desktop you may need to copy `seed-data/` there, or adjust the `hostPath` in `kubernetes/pv-duckdb.yaml` to point at your local folder.
+The PVC `duckdb-data` uses a `hostPath` volume at `/data/duckdb` on the node. On Docker Desktop, you may need to copy `seed-data/` there or adjust the `hostPath` in `kubernetes/pv-duckdb.yaml` to point to your local folder.
 
 ## Deploy DuckDB
 
@@ -48,7 +48,7 @@ kubectl apply -f kubernetes/duckdb.yaml
 
 The `duckdb` Deployment includes:
 
-- **init container** `seed-data` — runs `seed_data.py`; downloads the parquet file and creates the `earthquakes` table if missing
+- **init container** `seed-data` — runs `seed_data.py`; downloads the Parquet file and creates the `earthquakes` table if missing
 - **main container** — runs `duckdb-quack-service.py`; serves Quack on port `9494`
 
 Wait until the pod is ready:
@@ -90,7 +90,7 @@ Then visit [http://127.0.0.1:5000/graph-earthquakes](http://127.0.0.1:5000/graph
 kubectl apply -f kubernetes/cronjob-quakewath-check.yaml
 ```
 
-Periodic health check via `curl` to `/graph-earthquakes` (exercises both Flask and DuckDB).
+The CronJob performs a periodic health check via `curl` to `/graph-earthquakes`, exercising both Flask and DuckDB.
 
 ## Install Metrics Server
 
@@ -136,7 +136,7 @@ kubectl apply -f kubernetes/hpa-quakewatch.yaml
    kubectl run quakewatch-benchmark -it --rm --restart=Never --image=httpd:2.4 -- ab -n 100 -c 20 -s 60 http://quakewatch:5000/graph-earthquakes
    ```
 
-   (100 requests to the heaviest page, 20 in parallel.)
+   (100 requests to the heaviest page, 20 in parallel)
 
 2. Watch scaling events:
 
