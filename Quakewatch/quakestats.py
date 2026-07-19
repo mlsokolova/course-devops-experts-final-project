@@ -1,4 +1,5 @@
 """DuckDB/Quack client for earthquake statistics queries."""
+import json
 import os
 
 import duckdb
@@ -17,8 +18,7 @@ class QuakeStats:
         self.radius = radius
         self.conn = duckdb.connect(database=':memory:')
         self.quack_uri = f"quack:{self.QUACK__HOST}:{self.QUACK__PORT}"
-        self.stats = self.get_stats_over_area()
-        self.max_earthquake = self.get_max_earthquake_in_area()
+        self.all_stats = self.get_all_stats()
 
     def run_query(self, query):
         """Execute a SQL query against the remote Quack database."""
@@ -86,3 +86,65 @@ limit 1
 """
         query_res = self.run_query(sql)
         return self.jsonify_query_result(query_result=query_res)
+
+    def get_average_quakes_per_day(self):
+        """Return the average number of earthquakes per day in the configured area."""
+        sql = f"""
+with filtered_points as
+(
+select *
+from earthquakes
+WHERE ST_Distance_Spheroid(
+    ST_Point(latitude, longitude),
+    ST_Point({self.latitude}, {self.longitude})
+) <= {self.radius * 1000}
+)
+, daily_counts as
+(
+select CAST(epoch_ms(time) AS DATE) as quake_day,
+       count(*) as quake_count
+from filtered_points
+group by 1
+)
+select avg(quake_count) as average_quakes_per_day
+from daily_counts
+"""
+        query_res = self.run_query(sql)
+        return self.jsonify_query_result(query_result=query_res)
+
+    def get_day_with_max_earthquakes(self):
+        """Return the day with the most earthquakes in the configured area."""
+        sql = f"""
+with filtered_points as
+(
+select *
+from earthquakes
+WHERE ST_Distance_Spheroid(
+    ST_Point(latitude, longitude),
+    ST_Point({self.latitude}, {self.longitude})
+) <= {self.radius * 1000}
+)
+, daily_counts as
+(
+select CAST(epoch_ms(time) AS DATE) as quake_day,
+       count(*) as quake_count
+from filtered_points
+group by 1
+)
+select quake_day::VARCHAR as "Day",
+       quake_count as "Earthquakes"
+from daily_counts
+order by quake_count desc
+limit 1
+"""
+        query_res = self.run_query(sql)
+        return self.jsonify_query_result(query_result=query_res)
+
+    def get_all_stats(self):
+        """Combine all area statistics into a single JSON object."""
+        return json.dumps({
+            "stats": json.loads(self.get_stats_over_area()),
+            "max_earthquake": json.loads(self.get_max_earthquake_in_area()),
+            "avg_per_day": json.loads(self.get_average_quakes_per_day()),
+            "day_with_max_earthquakes": json.loads(self.get_day_with_max_earthquakes()),
+        })

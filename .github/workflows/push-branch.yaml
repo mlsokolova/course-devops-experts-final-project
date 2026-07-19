@@ -1,0 +1,34 @@
+# 1. WORKFLOW IDENTITY
+name: push into the branches, except main branch
+run-name: runs pylint on python files and builds the Docker image
+
+# 2. TRIGGER EVENTS
+on:
+  push:
+    branches-ignore:
+      - 'main'
+    
+# 4. JOBS AND STEPS
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the code
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install requirements
+        run: pip install -r Quakewatch/requirements.txt
+
+      - name: Install pylint
+        run: pip install pylint
+
+      - name: Run pylint
+        run: pylint $(ls -R Quakewatch/*.py)
+
+      - name: build the Docker image
+        run: docker build -t mlsokolova/quakewatch .

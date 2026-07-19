@@ -1,4 +1,5 @@
 """Dashboard blueprint and earthquake route handlers."""
+import json
 from datetime import datetime, timedelta
 
 import requests
@@ -140,7 +141,8 @@ class EarthquakeDashboard:
         loc_name = request.args.get('location', "Tel Aviv, Israel")
         top_events = get_top_earthquakes(limit=5)
         last_event = get_last_earthquake()
-        stats = EarthquakeDashboard.get_quake_stats(loc_name)
+        quake_stats = EarthquakeDashboard.get_quake_stats(loc_name)
+        all_stats = json.loads(quake_stats.all_stats)
         return render_template(
             'graph_dashboard.html',
             days=days,
@@ -148,7 +150,5 @@ class EarthquakeDashboard:
             countries=list(COUNTRIES.keys()),
             top_events=top_events,
             last_event=last_event,
-            stats=stats.stats,
-            max_earthquake=stats.max_earthquake,
-            earthquakes_stats=stats.stats,
+            all_stats=all_stats,
         )
