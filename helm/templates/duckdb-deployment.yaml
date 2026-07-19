@@ -55,13 +55,13 @@ spec:
             path: /
             port: {{ .Values.duckdb.service.httpPort }}
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 300
           timeoutSeconds: 30
         readinessProbe:
           tcpSocket:
             port: {{ .Values.duckdb.service.quackPort }}
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 300
           timeoutSeconds: 5
           failureThreshold: 3
         env:
