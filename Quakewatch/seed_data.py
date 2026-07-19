@@ -26,13 +26,17 @@ def download_large_github_file(url, dest_path):
 
 
 if __name__ == "__main__":
-    conn = duckdb.connect(DUCKDB__PATH)
+    
     try:
-        conn.sql("select * from earthquakes limit 1")
+        conn_ro = duckdb.connect(DUCKDB__PATH, read_only=True)
+        conn_ro.sql("select * from earthquakes limit 1")
         print("Table 'earthquakes' already exists. No need to download the seed data.")
+        conn_ro.close()
     except duckdb.Error:
         download_large_github_file(SEED_DATA_SOURCE_URL, LOCAL_FILENAME)
+        conn = duckdb.connect(DUCKDB__PATH)
         conn.sql(
             "CREATE TABLE earthquakes AS SELECT * "
             f"FROM read_parquet('{LOCAL_FILENAME}')"
         )
+        conn.close()
