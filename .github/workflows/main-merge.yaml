@@ -1,0 +1,31 @@
+# 1. WORKFLOW IDENTITY
+name: closed pull request into the main branch
+run-name: build and push the Docker image
+
+# 2. TRIGGER EVENTS
+on:
+  pull_request:
+    types:
+      - 'closed'
+    branches:
+      - 'main'
+    
+# 4. JOBS AND STEPS
+jobs:
+  build-and-push-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the code
+        uses: actions/checkout@v6
+
+      - name: build the Docker image
+        run: docker build -t $DOCKERHUB_REGISTRY/quakewatch:$GITHUB_REF_NAME .
+
+      - name: login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: push the Docker image
+        run: docker push $DOCKERHUB_REGISTRY/quakewatch:$GITHUB_REF_NAME
